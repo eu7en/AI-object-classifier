@@ -9,6 +9,9 @@ class Camera:
         if not self.camer.isOpened():
             raise ValueError("Camera unavailable")
         
+        self.width = self.camera.get(cv.CAP_PROP_FRAME_WIDTH)
+        self.height = self.camera.get(cv.CAP_PROP_FRAME_HEIGHT)
+
     def __del__(self):
         if self.camer.isOpened():
             self.camera.release()
