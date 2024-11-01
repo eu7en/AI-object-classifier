@@ -1,6 +1,11 @@
 ### main file
 
-import cam
+import app
 
-if __name__ == "main":
-    pass
+
+def main():
+    app.App(window_title="Object Classifier")
+
+
+if __name__ == "__main__":
+    main()

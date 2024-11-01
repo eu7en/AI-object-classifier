@@ -5,9 +5,11 @@ from tkinter import simpledialog
 
 import os
 
-import pillow.Image, PIL.ImageTk
+from PIL import Image, ImageTk
 
 import cam
+
+import model
 
 
 ### gui interface
@@ -19,11 +21,11 @@ class App:
 
         # for image counting
         # tipp: use dictionaries
-        self.objs = [1,2]
+        self.objs = [1,2] 
         self.counters = [1,1]
 
         # ai model
-        #self.model = 
+        self.model = model.Model()
         self.life_predict = False
 
         # camera and gui
@@ -37,7 +39,9 @@ class App:
         self.window.attributes('-topmost', True)
         self.window.mainloop()
 
+
     def init_gui(self):
+        '''main gui function'''
         self.canvas = tk.Canvas(self.window, width=self.camera.width, height=self.camera.height)
         self.canvas.pack()
 
@@ -66,14 +70,33 @@ class App:
         self.class_label.config(font=("Arial", 20))
         self.class_label.pack(anchor=tk.CENTER, expand=True)
 
-    def auto_predict_btn(self):
-        self.auto_predict = not self.auto_predict
+
+    def predict(self):
+        '''predicts the shown object with ai model'''
+        
+        picture = self.camera.picture()
+
+        prediction = self.model.predict(picture)
+        if prediction == 1:
+            self.class_label.config(text=self.classname_one)
+            return self.classname_one
+        if prediction == 2:
+            self.class_label.config(text=self.classname_two)
+            return self.classname_two
+
+
+    def life_predict_btn(self):
+        '''changes lifepredict value to stop lifepredict'''
+        self.life_predict = not self.life_predict
+
 
     def save_class(self, class_num):
+        '''saves the class'''
+
         ret, frame = self.camera.picture()
 
         # making sure directories for pictures will be there
-        for dir in class_num:
+        for dir in self.objs:
             if not os.path.exists(f'{dir}'):
                 os.mkdir(f'{dir}') 
 
@@ -87,4 +110,37 @@ class App:
 
         self.counters[class_num - 1] += 1
 
-        
+
+    def reset(self):
+        '''deletes all the files in current directories'''
+
+        for dir in self.objs:
+            for file in os.listdir(dir):
+                file_path = os.path.join(dir, file)
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+
+        self.counters = [1,1]
+        #self.model = model.Model()
+
+        self.class_label.config(text="class")
+
+    
+    def update(self):
+        '''updating the camera pictures'''
+
+        if self.life_predict:
+            self.predict()
+
+        ret, frame = self.camera.picture()
+
+        if ret:
+            self.photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
+            self.canvas.create_image(0,0,image=self.photo, anchor=tk.NW)
+
+        self.window.after(self.delay, self.update)
+
+
+    
+
+    
