@@ -5,17 +5,17 @@ from tkinter import simpledialog
 
 import os
 
-from PIL import Image, ImageTk
+import PIL.Image, PIL.ImageTk
 
 import cam
 
-import model
+from models import model_linearsvc as model
 
 
 ### gui interface
 
 class App:
-    def __intit__(self, window=tk.Tk(), window_title="Object Classifier"):
+    def __init__(self, window=tk.Tk(), window_title="Object Classifier"):
         self.window = window
         self.window_title = window_title
 
@@ -31,9 +31,10 @@ class App:
         # camera and gui
         self.camera = cam.Camera()
 
-        #self.
-        self.delay = 15
+        # self functions
+        self.init_gui()
 
+        self.delay = 15
         self.update()
 
         self.window.attributes('-topmost', True)
@@ -45,19 +46,19 @@ class App:
         self.canvas = tk.Canvas(self.window, width=self.camera.width, height=self.camera.height)
         self.canvas.pack()
 
-        self.btn_toggleauto = tk.Button(self.window, text="Auto Prediction", width=50, command=self.auto_predict_toggle)
+        self.btn_toggleauto = tk.Button(self.window, text="Auto Prediction", width=50, command=self.life_predict_btn)
         self.btn_toggleauto.pack(anchor=tk.CENTER, expand=True)
 
         self.classname_one = simpledialog.askstring("Classname One", "Enter the name of the first class:", parent=self.window)
         self.classname_two = simpledialog.askstring("Classname Two", "Enter the name of the second class:", parent=self.window)
 
-        self.btn_class_one = tk.Button(self.window, text=self.classname_one, width=50, command=lambda: self.save_for_class(1))
+        self.btn_class_one = tk.Button(self.window, text=self.classname_one, width=50, command=lambda: self.save_class(1))
         self.btn_class_one.pack(anchor=tk.CENTER, expand=True)
 
-        self.btn_class_two = tk.Button(self.window, text=self.classname_two, width=50, command=lambda: self.save_for_class(2))
+        self.btn_class_two = tk.Button(self.window, text=self.classname_two, width=50, command=lambda: self.save_class(2))
         self.btn_class_two.pack(anchor=tk.CENTER, expand=True)
 
-        self.btn_train = tk.Button(self.window, text="Train Model", width=50, command=lambda: self.model.train_model(self.counters))
+        self.btn_train = tk.Button(self.window, text="Train Model", width=50, command=lambda: self.model.train(self.counters))
         self.btn_train.pack(anchor=tk.CENTER, expand=True)
 
         self.btn_predict = tk.Button(self.window, text="Predcit", width=50, command=self.predict)

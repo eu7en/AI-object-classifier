@@ -1,3 +1,5 @@
+### linearsvc model 
+
 from sklearn.svm import LinearSVC
 import numpy as np 
 

@@ -4,7 +4,7 @@ import app
 
 
 def main():
-    app.App(window_title="Object Classifier")
+    app.App()
 
 
 if __name__ == "__main__":
